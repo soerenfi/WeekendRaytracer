@@ -1,0 +1,32 @@
+---
+# We'll use defaults from the Google style, but with a column limit of 120.
+BasedOnStyle: Google
+ColumnLimit: 120
+---
+Language: Cpp
+# Force pointers to the type for C++.
+DerivePointerAlignment: false
+PointerAlignment: Left
+# Regroup and sort includes for C++.
+IncludeBlocks: Regroup
+# cpplint C header extensions: 'h', 'hh'
+# cpplint C++ header extensions: 'hpp', 'hxx', 'h++'
+IncludeCategories:
+  - Regex: "^<queue>$" # Will otherwise be caught by the Qt regex
+    Priority: 15
+  - Regex: "^<Q[A-Z][A-Za-z]+>$" # Qt headers
+    Priority: 12
+  - Regex: "^<(clang|clang-c|cling|llvm|llvm-c)/" # LLVM headers
+    Priority: 13
+  - Regex: "^<MantleAPI/" # OpenPASS MantleAPI headers
+    Priority: 14
+  - Regex: "^<boost/" # Boost headers
+    Priority: 18
+  - Regex: "\\.h{1,2}>$" # C headers
+    Priority: 10
+  - Regex: "\\.h(pp|xx|\\+\\+)>$" # C++ headers
+    Priority: 19
+  - Regex: "^<" # Catch all remaining headers
+    Priority: 15
+  - Regex: ".*" # Catch anything else
+    Priority: 30
