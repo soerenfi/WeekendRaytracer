@@ -1,0 +1,24 @@
+{
+    "version": "0.0.1",
+    "configurations": [
+        {
+            "name": "launch WeekendRaytracer (Debug)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/bin/Debug-linux-x86_64/WeekendRaytracer/WeekendRaytracer",
+            "args": [],
+            "stopAtEntry": false,
+            "MIMode": "gdb",
+            "environment": [],
+            "externalConsole": false,
+            "cwd": "${workspaceFolder}",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        }
+    ]
+}
