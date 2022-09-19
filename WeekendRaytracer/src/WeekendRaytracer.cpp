@@ -49,11 +49,10 @@ class ExampleLayer : public Walnut::Layer
         lastRenderTime_ = timer_.ElapsedMillis();
     }
 
-    uint32_t viewport_width_{ 0 };
-    uint32_t viewport_height_{ 0 };
+    uint32_t viewport_width_, viewport_height_ = 0;
 
     Timer timer_;
-    float lastRenderTime_{ 0 };
+    float lastRenderTime_{ 0.0f };
 
     Renderer renderer_;
 };
