@@ -1,10 +1,10 @@
 #include <cstdint>
 #include <memory>
 
+#include "Renderer.hpp"
 #include "Walnut/Application.h"
 #include "Walnut/EntryPoint.h"
 #include "Walnut/Image.h"
-#include "Walnut/Random.h"
 #include "Walnut/Timer.h"
 
 using namespace Walnut;
@@ -25,11 +25,13 @@ class ExampleLayer : public Walnut::Layer
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
         ImGui::Begin("Viewport");
 
-        viewportWidth_ = ImGui::GetContentRegionAvail().x;
-        viewportHeight_ = ImGui::GetContentRegionAvail().y;
+        viewport_width_ = ImGui::GetContentRegionAvail().x;
+        viewport_height_ = ImGui::GetContentRegionAvail().y;
 
-        if (image_)
-            ImGui::Image(image_->GetDescriptorSet(), { (float)image_->GetWidth(), (float)image_->GetHeight() });
+        auto image = renderer_.GetFinalImage();
+        if (image)
+            ImGui::Image(image->GetDescriptorSet(), { (float)image->GetWidth(), (float)image->GetHeight() },
+                         ImVec2(0, 1), ImVec2(1, 0));
 
         ImGui::End();
         ImGui::PopStyleVar();
@@ -40,30 +42,20 @@ class ExampleLayer : public Walnut::Layer
     void Render()
     {
         timer_.Reset();
-        if (!image_ || viewportHeight_ != image_->GetWidth() || viewportWidth_ != image_->GetWidth())
-        {
-            image_ = std::make_shared<Image>(viewportWidth_, viewportHeight_, ImageFormat::RGBA);
-            delete[] imageData_;
-            imageData_ = new uint32_t[viewportWidth_ * viewportHeight_];
 
-            for (uint32_t i = 0; i < viewportWidth_ * viewportHeight_; i++)
-            {
-                imageData_[i] = Random::UInt();
-                imageData_[i] |= 0xff000000;
-            }
-            image_->SetData(imageData_);
-            lastRenderTime_ = timer_.ElapsedMillis();
-        }
+        renderer_.OnResize(viewport_width_, viewport_height_);
+        renderer_.Render();
+
+        lastRenderTime_ = timer_.ElapsedMillis();
     }
 
-    uint32_t viewportWidth_{ 0 };
-    uint32_t viewportHeight_{ 0 };
-
-    std::shared_ptr<Walnut::Image> image_;
-    uint32_t* imageData_ = nullptr;
+    uint32_t viewport_width_{ 0 };
+    uint32_t viewport_height_{ 0 };
 
     Timer timer_;
     float lastRenderTime_{ 0 };
+
+    Renderer renderer_;
 };
 
 Walnut::Application* Walnut::CreateApplication(int argc, char** argv)
