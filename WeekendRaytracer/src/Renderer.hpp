@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <glm/geometric.hpp>
 #include <glm/glm.hpp>
 #include <memory>
 
@@ -35,6 +36,7 @@ class Renderer
                 // image_data_[i] = Walnut::Random::UInt();
                 glm::vec2 coord{ (float)x / (float)final_image_->GetWidth(),
                                  (float)y / (float)final_image_->GetHeight() };
+                coord = coord * 2.0f - 1.0f;
                 image_data_[x + y * final_image_->GetWidth()] = PixelShader(coord);
             }
         }
@@ -49,10 +51,20 @@ class Renderer
   private:
     uint32_t PixelShader(glm::vec2 coord)
     {
-        uint8_t r = coord.x * 255.f;
-        uint8_t g = coord.y * 255.f;
+        glm::vec3 rayOrigin{ 0.0f, 0.0f, -2.0f };
+        glm::vec3 rayDirection{ coord.x, coord.y, -1.0f };
+        // rayDirection = glm::normalize(rayDirection);
+        float radius = 0.5f;
 
-        return 0xff000000 | (g << 8) | r;
+        float a = glm::dot(rayDirection, rayDirection);
+        float b = 2.0f * glm::dot(rayOrigin, rayDirection);
+        float c = glm::dot(rayOrigin, rayOrigin) - radius * radius;
+
+        float discriminant = b * b - 4.0f * a * c;
+        if (discriminant >= 0)
+            return 0xffff00ff;
+        else
+            return 0x0000000;
     }
 
   private:
