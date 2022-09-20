@@ -1,4 +1,4 @@
-#include "Renderer.hpp"
+#include "Renderer.h"
 
 #include <cstdint>
 #include <glm/geometric.hpp>
@@ -60,9 +60,11 @@ glm::vec4 Renderer::PixelShader(glm::vec2 coord)
     float radius = 0.5f;
     glm::vec3 rayDirection{ coord.x, coord.y, -1.0f };
 
+    glm::vec3 originCentre = rayOrigin_ - sphereOrigin_;
+
     float a = glm::dot(rayDirection, rayDirection);
-    float b = 2.0f * glm::dot(rayOrigin_, rayDirection);
-    float c = glm::dot(rayOrigin_, rayOrigin_) - radius * radius;
+    float b = 2.0f * glm::dot(originCentre, rayDirection);
+    float c = glm::dot(originCentre, originCentre) - radius * radius;
 
     float discriminant = b * b - 4.0f * a * c;
     if (discriminant < 0.0f)
@@ -74,8 +76,7 @@ glm::vec4 Renderer::PixelShader(glm::vec2 coord)
     glm::vec3 hitPoint = rayOrigin_ + rayDirection * closestT;
     glm::vec3 normal = glm::normalize(hitPoint);
 
-    glm::vec3 lightDir = glm::normalize(glm::vec3(-1, -1, 1));
-    float lightIntensity = glm::max(glm::dot(normal, -lightDir), 0.0f);  // == cos(angle)
+    float lightIntensity = glm::max(glm::dot(normal, lightDir_), 0.0f);  // == cos(angle)
 
     glm::vec3 sphereColor(1, 0, 1);
     sphereColor *= lightIntensity;

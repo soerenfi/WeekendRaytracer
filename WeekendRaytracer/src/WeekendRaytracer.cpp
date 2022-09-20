@@ -1,7 +1,7 @@
 #include <cstdint>
 #include <memory>
 
-#include "Renderer.hpp"
+#include "Renderer.h"
 #include "Walnut/Application.h"
 #include "Walnut/EntryPoint.h"
 #include "Walnut/Image.h"
