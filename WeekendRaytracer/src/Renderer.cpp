@@ -32,16 +32,18 @@ void Renderer::OnResize(uint32_t width, uint32_t height)
     image_data_ = new uint32_t[width * height];
 };
 
-void Renderer::Render()
+void Renderer::Render(const Camera& camera)
 {
+    const glm::vec3& rayOrigin = camera.GetPosition();
+    Ray ray;
+    ray.Origin = camera.GetPosition();
     for (uint32_t y = 0; y < final_image_->GetHeight(); y++)
     {
         for (uint32_t x = 0; x < final_image_->GetWidth(); x++)
         {
+            ray.Direction = camera.GetRayDirections()[x + y * final_image_->GetWidth()];
             // image_data_[i] = Walnut::Random::UInt();
-            glm::vec2 coord{ (float)x / (float)final_image_->GetWidth(), (float)y / (float)final_image_->GetHeight() };
-            coord = coord * 2.0f - 1.0f;
-            glm::vec4 color = PixelShader(coord);
+            glm::vec4 color = TraceRay(ray);
             color = glm::clamp(color, glm::vec4(0.0f), glm::vec4(1.0f));
             image_data_[x + y * final_image_->GetWidth()] = utils::ConvertToRGBA(color);
         }
@@ -54,16 +56,15 @@ std::shared_ptr<Walnut::Image> Renderer::GetFinalImage() const
     return final_image_;
 }
 
-glm::vec4 Renderer::PixelShader(glm::vec2 coord)
+glm::vec4 Renderer::TraceRay(const Ray& ray)
 {
     // rayDirection = glm::normalize(rayDirection);
     float radius = 0.5f;
-    glm::vec3 rayDirection{ coord.x, coord.y, -1.0f };
 
-    glm::vec3 originCentre = rayOrigin_ - sphereOrigin_;
+    glm::vec3 originCentre = ray.Origin - sphereOrigin_;
 
-    float a = glm::dot(rayDirection, rayDirection);
-    float b = 2.0f * glm::dot(originCentre, rayDirection);
+    float a = glm::dot(ray.Direction, ray.Direction);
+    float b = 2.0f * glm::dot(originCentre, ray.Direction);
     float c = glm::dot(originCentre, originCentre) - radius * radius;
 
     float discriminant = b * b - 4.0f * a * c;
@@ -73,7 +74,7 @@ glm::vec4 Renderer::PixelShader(glm::vec2 coord)
     float closestT = (-b - glm::sqrt(discriminant)) / (2.0f * a);
     float t0 = (-b + glm::sqrt(discriminant)) / (2.0f * a);  // Second hit distance (currently unused)
 
-    glm::vec3 hitPoint = rayOrigin_ + rayDirection * closestT;
+    glm::vec3 hitPoint = ray.Origin + ray.Direction * closestT;
     glm::vec3 normal = glm::normalize(hitPoint);
 
     float lightIntensity = glm::max(glm::dot(normal, lightDir_), 0.0f);  // == cos(angle)

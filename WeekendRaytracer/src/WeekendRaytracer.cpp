@@ -1,6 +1,7 @@
 #include <cstdint>
 #include <memory>
 
+#include "Camera.h"
 #include "Renderer.h"
 #include "Walnut/Application.h"
 #include "Walnut/EntryPoint.h"
@@ -9,9 +10,16 @@
 
 using namespace Walnut;
 
-class ExampleLayer : public Walnut::Layer
+class Viewport : public Walnut::Layer
 {
   public:
+    Viewport() : camera_(45.0f, 0.1f, 100.0f)
+    {
+    }
+    virtual void OnUpdate(float ts) override
+    {
+        camera_.OnUpdate(ts);
+    }
     virtual void OnUIRender() override
     {
         ImGui::Begin("Settings");
@@ -44,7 +52,8 @@ class ExampleLayer : public Walnut::Layer
         timer_.Reset();
 
         renderer_.OnResize(viewport_width_, viewport_height_);
-        renderer_.Render();
+        camera_.OnResize(viewport_width_, viewport_height_);
+        renderer_.Render(camera_);
 
         lastRenderTime_ = timer_.ElapsedMillis();
     }
@@ -55,6 +64,7 @@ class ExampleLayer : public Walnut::Layer
     float lastRenderTime_{ 0.0f };
 
     Renderer renderer_;
+    Camera camera_;
 };
 
 Walnut::Application* Walnut::CreateApplication(int argc, char** argv)
@@ -63,7 +73,7 @@ Walnut::Application* Walnut::CreateApplication(int argc, char** argv)
     spec.Name = "Weekend Raytracer";
 
     Walnut::Application* app = new Walnut::Application(spec);
-    app->PushLayer<ExampleLayer>();
+    app->PushLayer<Viewport>();
     app->SetMenubarCallback([app]() {
         if (ImGui::BeginMenu("File"))
         {
