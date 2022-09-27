@@ -10,6 +10,7 @@
 
 #include "Camera.h"
 #include "Ray.h"
+#include "Scene.h"
 #include "Walnut/Image.h"
 #include "Walnut/Random.h"
 
@@ -19,11 +20,11 @@ class Renderer
     Renderer() = default;
 
     void OnResize(uint32_t width, uint32_t height);
-    void Render(const Camera& cam);
+    void Render(const Scene& scene, const Camera& cam);
     std::shared_ptr<Walnut::Image> GetFinalImage() const;
 
   private:
-    glm::vec4 TraceRay(const Ray& ray);
+    glm::vec4 TraceRay(const Scene& scene, const Ray& ray);
 
   private:
     std::shared_ptr<Walnut::Image> final_image_;

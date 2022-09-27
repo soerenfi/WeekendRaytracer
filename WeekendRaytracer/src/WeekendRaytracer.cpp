@@ -15,6 +15,23 @@ class Viewport : public Walnut::Layer
   public:
     Viewport() : camera_(45.0f, 0.1f, 100.0f)
     {
+        camera_.setPosition(glm::vec3(0.f, 0.f, 3.f));
+        // camera_.lookAt(glm::vec3(0.f, 0.f, 0.f));
+        {
+            Sphere sphere;
+            sphere.position = { 0.0f, 0.0f, 0.0f };
+            sphere.radius = 0.5f;
+            sphere.albedo = { 1.0f, 0.0f, 1.0f };
+            scene_.spheres.push_back(sphere);
+        }
+
+        {
+            Sphere sphere;
+            sphere.position = { 1.0f, 0.0f, -5.0f };
+            sphere.radius = 1.5f;
+            sphere.albedo = { 0.2f, 0.3f, 1.0f };
+            scene_.spheres.push_back(sphere);
+        }
     }
     virtual void OnUpdate(float ts) override
     {
@@ -53,7 +70,7 @@ class Viewport : public Walnut::Layer
 
         renderer_.OnResize(viewport_width_, viewport_height_);
         camera_.OnResize(viewport_width_, viewport_height_);
-        renderer_.Render(camera_);
+        renderer_.Render(scene_, camera_);
 
         lastRenderTime_ = timer_.ElapsedMillis();
     }
@@ -65,6 +82,7 @@ class Viewport : public Walnut::Layer
 
     Renderer renderer_;
     Camera camera_;
+    Scene scene_;
 };
 
 Walnut::Application* Walnut::CreateApplication(int argc, char** argv)
