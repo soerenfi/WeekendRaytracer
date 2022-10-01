@@ -1,4 +1,5 @@
 #include <cstdint>
+#include <glm/gtc/type_ptr.hpp>
 #include <memory>
 
 #include "Camera.h"
@@ -21,7 +22,7 @@ class Viewport : public Walnut::Layer
             Sphere sphere;
             sphere.position = { 0.0f, 0.0f, 0.0f };
             sphere.radius = 0.5f;
-            sphere.albedo = { 1.0f, 0.0f, 1.0f };
+            sphere.material.albedo = { 1.0f, 0.0f, 1.0f };
             scene_.spheres.push_back(sphere);
         }
 
@@ -29,9 +30,12 @@ class Viewport : public Walnut::Layer
             Sphere sphere;
             sphere.position = { 1.0f, 0.0f, -5.0f };
             sphere.radius = 1.5f;
-            sphere.albedo = { 0.2f, 0.3f, 1.0f };
+            sphere.material.albedo = { 0.2f, 0.3f, 1.0f };
             scene_.spheres.push_back(sphere);
         }
+        Light light;
+        light.position = glm::vec3{ -1.0f, -1.0f, -1.0f };
+        scene_.lights.push_back(light);
     }
     virtual void OnUpdate(float ts) override
     {
@@ -45,6 +49,22 @@ class Viewport : public Walnut::Layer
         {
             Render();
         }
+
+        ImGui::Begin("Scene");
+        for (size_t i = 0; i < scene_.lights.size(); i++)
+        {
+            ImGui::PushID(i);
+
+            Light& light = scene_.lights[i];
+            ImGui::DragFloat3("Position", glm::value_ptr(light.position), 0.1f);
+            ImGui::DragFloat("Intensity", &light.intensity, 0.1f);
+            ImGui::ColorEdit3("Albedo", glm::value_ptr(light.color));
+
+            ImGui::Separator();
+
+            ImGui::PopID();
+        }
+        ImGui::End();
         ImGui::End();
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
@@ -58,8 +78,12 @@ class Viewport : public Walnut::Layer
             ImGui::Image(image->GetDescriptorSet(), { (float)image->GetWidth(), (float)image->GetHeight() },
                          ImVec2(0, 1), ImVec2(1, 0));
 
+        // ImGui::ShowDemoWindow();
+
         ImGui::End();
-        ImGui::PopStyleVar();
+        ImGui::PopStyleVar(
+
+        );
 
         Render();
     }

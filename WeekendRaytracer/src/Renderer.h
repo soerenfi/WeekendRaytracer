@@ -4,6 +4,7 @@
 
 #include <cstdint>
 #include <glm/exponential.hpp>
+#include <glm/fwd.hpp>
 #include <glm/geometric.hpp>
 #include <glm/glm.hpp>
 #include <memory>
@@ -24,12 +25,20 @@ class Renderer
     std::shared_ptr<Walnut::Image> GetFinalImage() const;
 
   private:
-    glm::vec4 TraceRay(const Scene& scene, const Ray& ray);
+    glm::vec4 PerPixel(uint32_t x, uint32_t y);
+    RayPayload TraceRay(Ray& ray);
+    RayPayload ClosestHitShader(Ray& ray);
+    RayPayload MissShader(Ray& ray);
+
+    glm::vec3 reflect(glm::vec3 ray, glm::vec3 normal);
 
   private:
     std::shared_ptr<Walnut::Image> final_image_;
     uint32_t* image_data_ = nullptr;
 
-    glm::vec3 sphereOrigin_{ 0, 0, 0 };
-    glm::vec3 lightDir_ = glm::normalize(glm::vec3(-1, -1, 1));
+    const Scene* scene_ = nullptr;
+    const Camera* camera_ = nullptr;
+    // glm::vec3 sphereOrigin_{ 0.0f, 0.0f, 0.0f };
+    static constexpr int16_t kTraceDepth = 1;
+    static constexpr float kFarClip = 1000.0f;
 };

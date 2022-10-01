@@ -6,7 +6,14 @@
 struct Material
 {
     glm::vec3 albedo{ 1.0f };
-    float specular{ 1.0f };
+    float specular{ 0.1f };
+};
+
+struct Light
+{
+    glm::vec3 position;
+    glm::vec3 color{ 1.0f };
+    float intensity;
 };
 
 struct Sphere
@@ -18,10 +25,12 @@ struct Sphere
 
     bool RayIntersect(const glm::vec3& origin, const glm::vec3& direction, float firstHit)
     {
+        return true;
     }
 };
 
 struct Scene
 {
     std::vector<Sphere> spheres;
+    std::vector<Light> lights;
 };
