@@ -19,22 +19,28 @@ class Viewport : public Walnut::Layer
         camera_.setPosition(glm::vec3(0.f, 0.f, 3.f));
         // camera_.lookAt(glm::vec3(0.f, 0.f, 0.f));
         {
-            Sphere sphere;
-            sphere.position = { 0.0f, 0.0f, 0.0f };
-            sphere.radius = 0.5f;
-            sphere.material.albedo = { 1.0f, 0.0f, 1.0f };
-            scene_.spheres.push_back(sphere);
+            std::unique_ptr<Sphere> sphere = std::make_unique<Sphere>();
+            sphere->setPosition({ 0.0f, 0.0f, 0.0f });
+            sphere->setRadius(0.5f);
+
+            Material metal;
+            metal.setAlbedo({ 1.0f, 0.0f, 1.0f });
+            sphere->setMaterial(metal);
+            scene_.addObject(std::move(sphere));
         }
 
-        {
-            Sphere sphere;
-            sphere.position = { 1.0f, 0.0f, -5.0f };
-            sphere.radius = 1.5f;
-            sphere.material.albedo = { 0.2f, 0.3f, 1.0f };
-            scene_.spheres.push_back(sphere);
-        }
+        // {
+        //     std::unique_ptr<Sphere> sphere = std::make_unique<Sphere>();
+        //     sphere.setPosition({ 1.0f, 0.0f, -5.0f });
+        //     sphere.setRadius(1.0f);
+
+        //     Material metal;
+        //     metal.setAlbedo({ 1.0f, 0.0f, 1.0f });
+        //     sphere.setMaterial(metal);
+        //     scene_.addObject(sphere);
+        // }
         Light light;
-        light.position = glm::vec3{ -1.0f, -1.0f, -1.0f };
+        light.position_ = glm::vec3{ -1.0f, -1.0f, -1.0f };
         scene_.lights.push_back(light);
     }
     virtual void OnUpdate(float ts) override
@@ -56,9 +62,9 @@ class Viewport : public Walnut::Layer
             ImGui::PushID(i);
 
             Light& light = scene_.lights[i];
-            ImGui::DragFloat3("Position", glm::value_ptr(light.position), 0.1f);
-            ImGui::DragFloat("Intensity", &light.intensity, 0.1f);
-            ImGui::ColorEdit3("Albedo", glm::value_ptr(light.color));
+            ImGui::DragFloat3("Position", glm::value_ptr(light.position_), 0.1f);
+            ImGui::DragFloat("Intensity", &light.intensity_, 0.1f);
+            // ImGui::ColorEdit3("Albedo", glm::value_ptr(light.color_));
 
             ImGui::Separator();
 
