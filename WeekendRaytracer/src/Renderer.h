@@ -33,11 +33,11 @@ class Renderer
     glm::vec3 reflect(glm::vec3 ray, glm::vec3 normal);
 
   private:
-    std::shared_ptr<Walnut::Image> final_image_;
-    uint32_t* image_data_ = nullptr;
+    std::shared_ptr<Walnut::Image> m_FinalImage;
+    uint32_t* m_ImageData = nullptr;
 
-    const Scene* scene_ = nullptr;
-    const Camera* camera_ = nullptr;
+    const Scene* m_Scene = nullptr;
+    const Camera* m_Camera = nullptr;
     // glm::vec3 sphereOrigin_{ 0.0f, 0.0f, 0.0f };
     static constexpr int16_t kTraceDepth = 1;
     static constexpr float kFarClip = 1000.0f;

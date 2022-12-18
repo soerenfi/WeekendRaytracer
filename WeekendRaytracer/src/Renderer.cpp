@@ -26,20 +26,20 @@ static uint32_t ConvertToRGBA(const glm::vec4& color)
 
 void Renderer::OnResize(uint32_t width, uint32_t height)
 {
-    if (final_image_)
+    if (m_FinalImage)
     {
-        final_image_->Resize(width, height);
+        m_FinalImage->Resize(width, height);
     }
     else
     {
-        final_image_ = std::make_shared<Walnut::Image>(width, height, Walnut::ImageFormat::RGBA);
+        m_FinalImage = std::make_shared<Walnut::Image>(width, height, Walnut::ImageFormat::RGBA);
     }
-    delete[] image_data_;
-    image_data_ = new uint32_t[width * height];
+    delete[] m_ImageData;
+    m_ImageData = new uint32_t[width * height];
 };
 std::shared_ptr<Walnut::Image> Renderer::GetFinalImage() const
 {
-    return final_image_;
+    return m_FinalImage;
 }
 // void Renderer::RaySphereIntersection()
 // {
@@ -47,24 +47,24 @@ std::shared_ptr<Walnut::Image> Renderer::GetFinalImage() const
 
 void Renderer::Render(const Scene& scene, const Camera& camera)
 {
-    scene_ = &scene;
-    camera_ = &camera;
+    m_Scene = &scene;
+    m_Camera = &camera;
 
-    for (uint32_t y = 0; y < final_image_->GetHeight(); y++)
+    for (uint32_t y = 0; y < m_FinalImage->GetHeight(); y++)
     {
-        for (uint32_t x = 0; x < final_image_->GetWidth(); x++)
+        for (uint32_t x = 0; x < m_FinalImage->GetWidth(); x++)
         {
             auto color = PerPixel(x, y);
-            image_data_[x + y * final_image_->GetWidth()] = utils::ConvertToRGBA(color);
+            m_ImageData[x + y * m_FinalImage->GetWidth()] = utils::ConvertToRGBA(color);
         }
     }
-    final_image_->SetData(image_data_);
+    m_FinalImage->SetData(m_ImageData);
 }
 glm::vec4 Renderer::PerPixel(uint32_t x, uint32_t y)
 {
     Ray ray;
-    ray.Origin = camera_->GetPosition();
-    ray.Direction = camera_->GetRayDirections()[x + y * final_image_->GetWidth()];
+    ray.Origin = m_Camera->GetPosition();
+    ray.Direction = m_Camera->GetRayDirections()[x + y * m_FinalImage->GetWidth()];
 
     auto payload = TraceRay(ray);
 
@@ -89,30 +89,16 @@ RayPayload Renderer::TraceRay(Ray& ray)
 
     int32_t index = -1;
 
-    for (size_t i = 0; i < scene_->spheres.size(); i++)
+    for (size_t i = 0; i < m_Scene->objects.size(); i++)
     {
-        const Sphere& sphere = scene_->spheres[i];
-        glm::vec3 origin = ray.Origin - sphere.position;
+        const Object* object = m_Scene->objects[i].get();
 
-        float a = glm::dot(ray.Direction, ray.Direction);
-        float b = 2.0f * glm::dot(origin, ray.Direction);
-        float c = glm::dot(origin, origin) - sphere.radius * sphere.radius;
+        float hitDistance = -1;
+        bool intersection = object->rayIntersection(ray.Origin, ray.Direction, hitDistance);
 
-        // Quadratic forumula discriminant:
-        // b^2 - 4ac
-
-        float discriminant = b * b - 4.0f * a * c;
-        if (discriminant < 0.0f)
-            continue;
-
-        // Quadratic formula:
-        // (-b +- sqrt(discriminant)) / 2a
-
-        // float t0 = (-b + glm::sqrt(discriminant)) / (2.0f * a); // Second hit distance (currently unused)
-        float closestT = (-b - glm::sqrt(discriminant)) / (2.0f * a);
-        if (closestT > 0.0f && closestT < ray.payload.hitDistance)
+        if (intersection && hitDistance < ray.payload.hitDistance)
         {
-            ray.payload.hitDistance = closestT;
+            ray.payload.hitDistance = hitDistance;
             ray.payload.objectIndex = i;
         }
     }
@@ -125,21 +111,21 @@ RayPayload Renderer::TraceRay(Ray& ray)
 
 RayPayload Renderer::ClosestHitShader(Ray& ray)
 {
-    const Sphere& hitSphere = scene_->spheres[ray.payload.objectIndex];
+    const Object* hitObject = m_Scene->objects[ray.payload.objectIndex].get();
 
-    glm::vec3 origin = ray.Origin - hitSphere.position;
+    glm::vec3 origin = ray.Origin - hitObject->Position;
     ray.payload.hitPosition = origin + ray.Direction * ray.payload.hitDistance;
     ray.payload.hitNormal = glm::normalize(ray.payload.hitPosition);
-    ray.payload.hitPosition += hitSphere.position;
-    ray.payload.color = (hitSphere.material.albedo);
+    ray.payload.hitPosition += hitObject->Position;
+    ray.payload.color = (hitObject->getMaterial().getAlbedo());
     // ray.payload.albedo += (hitSphere.albedo * glm::vec3(0.2));
 
-    glm::vec3 lightDirection = glm::normalize(scene_->lights[0].position - ray.payload.hitPosition);
+    glm::vec3 lightDirection = glm::normalize(m_Scene->lights[0].Position - ray.payload.hitPosition);
     float ambient = .1f;
     float diffuse = .7f * glm::max(glm::dot(ray.payload.hitNormal, lightDirection), 0.0f);  // == cos(angle)
     float specular =
         .2f * std::pow(std::max(0.f, glm::dot(reflect(lightDirection, ray.payload.hitNormal), ray.Direction)),
-                       hitSphere.material.specular);
+                       hitObject->getMaterial().getMetallic());
     ray.payload.color *= (ambient + diffuse);
     // ray.payload.color *= (ambient + diffuse + specular);
 
