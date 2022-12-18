@@ -4,9 +4,9 @@
 
 struct RayPayload
 {
-    float hitDistance = std::numeric_limits<float>::max();
-    glm::vec3 hitPosition;
-    glm::vec3 hitNormal;
+    float HitDistance = std::numeric_limits<float>::max();
+    glm::vec3 HitPosition;
+    glm::vec3 HitNormal;
     glm::vec3 color = glm::vec3(0.0f);
     uint32_t objectIndex;
     uint16_t traceDepth = 0;

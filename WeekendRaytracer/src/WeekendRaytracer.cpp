@@ -16,16 +16,18 @@ class Viewport : public Walnut::Layer
   public:
     Viewport() : m_Camera(45.0f, 0.1f, 100.0f)
     {
-        m_Camera.setPosition(glm::vec3(0.f, 0.f, 3.f));
+        // m_Camera.setPosition(glm::vec3(0.f, 0.f, 3.f));
         // m_Camera.lookAt(glm::vec3(0.f, 0.f, 0.f));
         {
             Material* metal = m_Scene.addMaterial("Metal1");
             metal->setAlbedo({ 0.8f, 0.0f, 0.0f });
+            metal->setMetallic(1.0f);
             Material* metal2 = m_Scene.addMaterial("Metal2");
             metal->setAlbedo({ 0.0f, 0.0f, 0.8f });
-
+        }
+        {
             std::unique_ptr<Sphere> sphere = std::make_unique<Sphere>();
-            sphere->setPosition({ 0.0f, 0.0f, 0.0f });
+            sphere->setPosition({ 0.0f, 0.0f, -1.0f });
             sphere->setRadius(0.5f);
             sphere->setMaterial("Metal1", m_Scene);
             m_Scene.addObject(std::move(sphere));
@@ -39,10 +41,12 @@ class Viewport : public Walnut::Layer
             m_Scene.addObject(std::move(sphere));
         }
 
-        Light light;
-        light.Position = glm::vec3{ -1.0f, -1.0f, -1.0f };
-        light.Intensity = 1;
-        m_Scene.lights.push_back(light);
+        {
+            Light light;
+            light.Position = glm::vec3{ -1.0f, 3.0f, -2.0f };
+            light.Intensity = 1;
+            m_Scene.lights.push_back(light);
+        }
     }
     virtual void OnUpdate(float ts) override
     {
@@ -70,18 +74,33 @@ class Viewport : public Walnut::Layer
             ImGui::PopID();
         }
 
-        for (size_t i = 0; i < m_Scene.lights.size(); i++)
-        {
-            ImGui::PushID(i);
+        ImGui::Separator();
 
-            Light& light = m_Scene.lights[i];
-            ImGui::DragFloat3("Position", glm::value_ptr(light.Position), 0.1f);
+        for (size_t j = 0; j < m_Scene.lights.size(); j++)
+        {
+            ImGui::PushID(j);
+
+            Light& light = m_Scene.lights[j];
+            // ImGui::DragFloat3("Position", glm::value_ptr(light.Position), 0.1f);
             ImGui::DragFloat("Intensity", &light.Intensity, 0.1f);
-            //   ImGui::ColorEdit3("Albedo", glm::value_ptr(light.Color));
 
             ImGui::Separator();
             ImGui::PopID();
         }
+        ImGui::Separator();
+
+        for (size_t k = 0; k < m_Scene.materials.size(); k++)
+        {
+            ImGui::PushID(k);
+
+            Material& mat = m_Scene.materials[k];
+            ImGui::ColorEdit3("Albedo", glm::value_ptr(mat.m_Albedo));
+            ImGui::SliderFloat("Metallic", &mat.m_Metallic, 0.0f, 100.f);
+
+            ImGui::Separator();
+            ImGui::PopID();
+        }
+
         ImGui::End();
         ImGui::End();
 

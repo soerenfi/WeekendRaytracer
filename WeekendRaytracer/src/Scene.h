@@ -15,7 +15,10 @@ class Material
     {
         m_Albedo = albedo;
     }
-
+    void setMetallic(float metallic)
+    {
+        m_Metallic = metallic;
+    }
     const glm::vec3& getAlbedo() const
     {
         return m_Albedo;

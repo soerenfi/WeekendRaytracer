@@ -27,14 +27,14 @@ class Camera
     {
         return m_InverseView;
     }
-    void setPosition(const glm::vec3& position)
-    {
-        m_Position = position;
-    }
-    void lookAt(const glm::vec3 at)
-    {
-        m_ForwardDirection = at;
-    }
+    // void setPosition(const glm::vec3& position)
+    // {
+    //     m_Position = position;
+    // }
+    // void lookAt(const glm::vec3 at)
+    // {
+    //     m_ForwardDirection = at;
+    // }
     const glm::vec3& GetPosition() const
     {
         return m_Position;
