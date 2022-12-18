@@ -42,9 +42,10 @@ bool Sphere::rayIntersection(const glm::vec3& rayOrigin, const glm::vec3 rayDire
 
     // float t0 = (-b + glm::sqrt(discriminant)) / (2.0f * a);
     float closestT = (-b - glm::sqrt(discriminant)) / (2.0f * a);
-    // if (closestT > 0.0f && closestT < ray.payload.hitDistance)
-    // {
-    hitDistance = closestT;
-    // }
-    return true;
+    if (closestT > 0.0f)
+    {
+        hitDistance = closestT;
+        return true;
+    }
+    return false;
 }

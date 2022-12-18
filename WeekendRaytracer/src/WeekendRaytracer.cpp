@@ -28,15 +28,15 @@ class Viewport : public Walnut::Layer
         {
             std::unique_ptr<Sphere> sphere = std::make_unique<Sphere>();
             sphere->setPosition({ 0.0f, 0.0f, -1.0f });
-            sphere->setRadius(0.5f);
+            sphere->setRadius(1.0f);
             sphere->setMaterial("Metal1", m_Scene);
             m_Scene.addObject(std::move(sphere));
         }
 
         {
             std::unique_ptr<Sphere> sphere = std::make_unique<Sphere>();
-            sphere->setPosition({ 1.0f, 0.0f, -5.0f });
-            sphere->setRadius(1.0f);
+            sphere->setPosition({ 1.0f, -101.0f, -5.0f });
+            sphere->setRadius(100.0f);
             sphere->setMaterial("Metal2", m_Scene);
             m_Scene.addObject(std::move(sphere));
         }

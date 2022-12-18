@@ -76,17 +76,19 @@ glm::vec4 Renderer::PerPixel(uint32_t x, uint32_t y)
 
         if (payload.HitDistance < 0.0f)
         {
-            glm::vec3 skyColor = glm::vec3(0.6f, 0.7f, 0.9f);
+            glm::vec3 skyColor = glm::vec3(0.3f, 0.4f, 0.5f);
             ray.payload.color = skyColor;
             break;
         }
 
         Object* hitObject = m_Scene->objects[ray.payload.objectIndex].get();
+        const Material& hitMaterial = hitObject->getMaterial();
+
         glm::vec3 lightDir = glm::normalize(glm::vec3{ -1, -1, -1 });
         // glm::vec3 lightDirection = glm::normalize(m_Scene->lights[0].Position - ray.payload.HitPosition);
         float lightIntensity = glm::max(glm::dot(payload.HitNormal, -lightDir), 0.0f);
 
-        ray.payload.color += (hitObject->getMaterial().getAlbedo()) * lightIntensity * multiplier;
+        ray.payload.color += (hitMaterial.getAlbedo()) * lightIntensity * multiplier;
         // float ambient = .2f;
         // float diffuse = .6f * glm::max(glm::dot(ray.payload.HitNormal, lightDirection), 0.0f);  // == cos(angle)
         // float specular =
@@ -111,21 +113,14 @@ glm::vec3 Renderer::reflect(glm::vec3 ray, glm::vec3 normal)
 
 RayPayload Renderer::TraceRay(Ray& ray)
 {
-    if (ray.payload.traceDepth > kTraceDepth)
-    {
-        return ray.payload;
-    }
-
-    int32_t index = -1;
-
     for (size_t i = 0; i < m_Scene->objects.size(); i++)
     {
         const Object* object = m_Scene->objects[i].get();
 
-        float hitDistance = -1;
+        float hitDistance = std::numeric_limits<float>::max();
         bool intersection = object->rayIntersection(ray.Origin, ray.Direction, hitDistance);
 
-        if (intersection && hitDistance > 0.0f && hitDistance < ray.payload.HitDistance)
+        if (intersection && hitDistance < ray.payload.HitDistance)
         {
             ray.payload.HitDistance = hitDistance;
             ray.payload.objectIndex = i;
@@ -152,7 +147,7 @@ RayPayload Renderer::ClosestHitShader(Ray& ray)
 
 RayPayload Renderer::MissShader(Ray& ray)
 {
-    ray.payload.HitDistance = -1;
+    ray.payload.HitDistance = -1.0f;
     // ray.payload.albedo = queryhrdi;
     return ray.payload;
 }
