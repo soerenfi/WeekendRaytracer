@@ -66,15 +66,44 @@ glm::vec4 Renderer::PerPixel(uint32_t x, uint32_t y)
     ray.Origin = m_Camera->GetPosition();
     ray.Direction = m_Camera->GetRayDirections()[x + y * m_FinalImage->GetWidth()];
 
-    auto payload = TraceRay(ray);
+    glm::vec3 color(0.0f);
+    float multiplier = .5f;
 
-    // if (payload.hitDistance > 1000.f)
-    // {
-    //     return glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
-    // }
+    int bounces = 2;
+    for (int i = 0; i < bounces; i++)
+    {
+        auto payload = TraceRay(ray);
 
+        if (payload.HitDistance < 0.0f)
+        {
+            glm::vec3 skyColor = glm::vec3(0.6f, 0.7f, 0.9f);
+            ray.payload.color = skyColor;
+            break;
+        }
+
+        Object* hitObject = m_Scene->objects[ray.payload.objectIndex].get();
+        glm::vec3 lightDir = glm::normalize(glm::vec3{ -1, -1, -1 });
+        // glm::vec3 lightDirection = glm::normalize(m_Scene->lights[0].Position - ray.payload.HitPosition);
+        float lightIntensity = glm::max(glm::dot(payload.HitNormal, -lightDir), 0.0f);
+
+        ray.payload.color += (hitObject->getMaterial().getAlbedo()) * lightIntensity * multiplier;
+        // float ambient = .2f;
+        // float diffuse = .6f * glm::max(glm::dot(ray.payload.HitNormal, lightDirection), 0.0f);  // == cos(angle)
+        // float specular =
+        //     0.2f * std::pow(std::max(0.f, glm::dot(reflect(lightDirection, ray.payload.HitNormal), ray.Direction)),
+        //                     hitObject->getMaterial().getMetallic());
+        // ray.payload.color *= (ambient + diffuse + specular);
+
+        multiplier *= 0.5f;
+        ray.Origin = payload.HitPosition + payload.HitNormal * 0.0001f;
+        ray.Direction = glm::reflect(ray.Direction, payload.HitNormal);
+        //  +
+        // m_Scene->objects.at(ray.payload.objectIndex)->getMaterial().getRoughness() *
+        // Walnut::Random::Vec3(-0.5f, 0.5f));
+    }
     return glm::vec4(ray.payload.color, 1.0f);
 }
+
 glm::vec3 Renderer::reflect(glm::vec3 ray, glm::vec3 normal)
 {
     return ray - (glm::vec3(2.0) * glm::dot(ray, normal) * normal);
@@ -96,14 +125,14 @@ RayPayload Renderer::TraceRay(Ray& ray)
         float hitDistance = -1;
         bool intersection = object->rayIntersection(ray.Origin, ray.Direction, hitDistance);
 
-        if (intersection && hitDistance < ray.payload.hitDistance)
+        if (intersection && hitDistance > 0.0f && hitDistance < ray.payload.HitDistance)
         {
-            ray.payload.hitDistance = hitDistance;
+            ray.payload.HitDistance = hitDistance;
             ray.payload.objectIndex = i;
         }
     }
 
-    if (ray.payload.hitDistance > kFarClip)
+    if (ray.payload.HitDistance > kFarClip)
         return MissShader(ray);
 
     return ClosestHitShader(ray);
@@ -114,36 +143,16 @@ RayPayload Renderer::ClosestHitShader(Ray& ray)
     const Object* hitObject = m_Scene->objects[ray.payload.objectIndex].get();
 
     glm::vec3 origin = ray.Origin - hitObject->Position;
-    ray.payload.hitPosition = origin + ray.Direction * ray.payload.hitDistance;
-    ray.payload.hitNormal = glm::normalize(ray.payload.hitPosition);
-    ray.payload.hitPosition += hitObject->Position;
-    ray.payload.color = (hitObject->getMaterial().getAlbedo());
-    // ray.payload.albedo += (hitSphere.albedo * glm::vec3(0.2));
+    ray.payload.HitPosition = origin + ray.Direction * ray.payload.HitDistance;
+    ray.payload.HitNormal = glm::normalize(ray.payload.HitPosition);
+    ray.payload.HitPosition += hitObject->Position;
 
-    glm::vec3 lightDirection = glm::normalize(m_Scene->lights[0].Position - ray.payload.hitPosition);
-    float ambient = .1f;
-    float diffuse = .7f * glm::max(glm::dot(ray.payload.hitNormal, lightDirection), 0.0f);  // == cos(angle)
-    float specular =
-        .2f * std::pow(std::max(0.f, glm::dot(reflect(lightDirection, ray.payload.hitNormal), ray.Direction)),
-                       hitObject->getMaterial().getMetallic());
-    ray.payload.color *= (ambient + diffuse);
-    // ray.payload.color *= (ambient + diffuse + specular);
-
-    // Ray bounceRay;
-    // bounceRay.payload = ray.payload;
-    // bounceRay.payload.traceDepth = ray.payload.traceDepth + 1;
-    // bounceRay.Origin = ray.payload.hitPosition;
-    // bounceRay.Direction = ray.payload.hitNormal;
-    // bounceRay.Direction =
-    //     ray.Direction - (glm::vec3(2.0) * glm::dot(ray.Direction, ray.payload.hitNormal) * ray.payload.hitNormal);
-
-    // return TraceRay(bounceRay);
     return ray.payload;
 }
 
 RayPayload Renderer::MissShader(Ray& ray)
 {
-    ray.payload.color = glm::vec3(.1f, .1f, .1f);
+    ray.payload.HitDistance = -1;
     // ray.payload.albedo = queryhrdi;
     return ray.payload;
 }
