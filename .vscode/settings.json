@@ -1,0 +1,7 @@
+{
+    "editor.formatOnSave": true,
+    "C_Cpp.intelliSenseEngine": "disabled",
+    "terminal.integrated.shellArgs.linux": [
+        "-i"
+    ]
+}
