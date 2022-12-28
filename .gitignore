@@ -14,3 +14,5 @@ bin-int/
 
 Makefile
 Makefile.in
+
+compile_commands
