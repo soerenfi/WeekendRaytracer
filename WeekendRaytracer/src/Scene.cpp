@@ -9,29 +9,29 @@
 
 #include "Ray.h"
 
-// void Object::SetMaterial(std::string materialName, Scene& scene) {
-//   auto it = std::find_if(scene.materials_.begin(), scene.materials_.end(), [&](const Material& mat) -> bool {
-//     return mat.name_ == materialName;
-//   });
-//   if (it == scene.materials_.end()) {
-//     throw std::logic_error("Material unknown");
-//   }
-//   materialIndex = it->index_;
-// }
+void Object::setMaterial(std::string materialName, Scene& scene) {
+  auto it = std::find_if(scene.materials_.begin(), scene.materials_.end(), [&](const Material& mat) -> bool {
+    return mat.name_ == materialName;
+  });
+  if (it == scene.materials_.end()) {
+    throw std::logic_error("Material unknown");  // TODO (soeren) does not work
+  }
+  materialIndex = it->index_;
+}
 
-// const Material& Object::GetMaterial() const {
+// const Material& Object::getMaterial() const {
 //   if (scene_ == nullptr) {
 //     throw std::runtime_error("Scene of Object not set!");
 //   }
 //   return scene_->materials_.at(materialIndex);
 // }
 
-bool Sphere::RayIntersection(const Ray& ray, float& hitDistance) const {
+bool Sphere::rayIntersection(const Ray& ray, float& hitDistance) const {
   glm::vec3 origin = ray.origin - position;
 
   float a = glm::dot(ray.direction, ray.direction);
   float b = 2.0f * glm::dot(origin, ray.direction);
-  float c = glm::dot(origin, origin) - radius_ * radius_;
+  float c = glm::dot(origin, origin) - radius * radius;
 
   // Quadratic forumula discriminant:
   // b^2 - 4ac

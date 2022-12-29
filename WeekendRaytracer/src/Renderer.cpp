@@ -115,6 +115,9 @@ glm::vec4 Renderer::PerPixel(uint32_t x, uint32_t y) {
     glm::vec3 lightDir = glm::normalize(glm::vec3(-1, -1, -1));
     float lightIntensity = glm::max(glm::dot(payload.hitNormal, -lightDir), 0.0f);  // == cos(angle)
 
+    // const Object* object = activeScene_->objects_[payload.objectIndex].get();
+    // const Material& material = activeScene_->materials_[object->materialIndex];
+
     const Sphere& sphere = activeScene_->spheres_[payload.objectIndex];
     const Material& material = activeScene_->materials_[sphere.materialIndex];
 
@@ -137,12 +140,12 @@ RayPayload Renderer::TraceRay(const Ray& ray) {
   float hitDistance = std::numeric_limits<float>::max();
   payload.hitDistance = std::numeric_limits<float>::max();
 
-  // for (size_t i = 0; i < scene_->objects_.size(); i++) {  // TODO(soerenfi) Add Object Index
-  //   const Object* object = scene_->objects_[i].get();
+  // for (size_t i = 0; i < activeScene_->objects_.size(); i++) {
+  //   const Object* object = activeScene_->objects_[i].get();
   for (size_t i = 0; i < activeScene_->spheres_.size(); i++) {
     const Sphere& sphere = activeScene_->spheres_[i];
 
-    bool intersection = sphere.RayIntersection(ray, hitDistance);
+    bool intersection = sphere.rayIntersection(ray, hitDistance);
     if (!intersection) {
       continue;
     }
@@ -160,6 +163,7 @@ RayPayload Renderer::ClosestHit(const Ray& ray, RayPayload payload) {
   // RayPayload payload2;
   // payload.hitDistance = hitDistance;
   // payload.objectIndex = objectIndex;
+  const Object* closestObject = activeScene_->objects_[payload.objectIndex].get();
   const Sphere& closestSphere = activeScene_->spheres_[payload.objectIndex];
 
   glm::vec3 origin = ray.origin - closestSphere.position;

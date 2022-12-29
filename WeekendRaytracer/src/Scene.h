@@ -15,10 +15,10 @@ struct Material {
   float roughness = 1.0f;
   float metallic = 0.0f;
 
-  // private:
-  //   Material(const std::string name, int index)
-  //       : index_(index)
-  //       , name_(name) {}
+private:
+  Material(const std::string name, int index)
+      : index_(index)
+      , name_(name) {}
 
   int index_{-1};
   std::string name_{};
@@ -33,16 +33,17 @@ public:
   // virtual void SetPosition(glm::vec3 pos) {
   //   Position = pos;
   // }
-  // virtual void SetMaterial(Material* mat) {
-  //   materialIndex = mat->index_;
-  // }
-  // virtual void SetMaterial(std::string materialName, Scene& scene);
-  // const Material& GetMaterial() const;
+  virtual void setMaterial(Material* mat) {
+    materialIndex = mat->index_;
+  }
+  virtual void setMaterial(std::string materialName, Scene& scene);
+
+  const Material& getMaterial() const;
 
   glm::vec3 position{0.0f};
   int materialIndex{-1};
 
-  virtual bool RayIntersection(const Ray& ray, float& hitDistance) const = 0;
+  virtual bool rayIntersection(const Ray& ray, float& hitDistance) const = 0;
 
 private:
   Scene* scene_ = nullptr;
@@ -53,9 +54,9 @@ private:
 class Sphere : public Object {
 public:
   virtual ~Sphere() = default;
-  bool RayIntersection(const Ray& ray, float& hitDistance) const override;
+  bool rayIntersection(const Ray& ray, float& hitDistance) const override;
 
-  float radius_ = 0.5f;
+  float radius = 0.5f;
 };
 
 // struct Scene {
@@ -65,18 +66,18 @@ public:
 
 class Scene {
 public:
-  void AddObject(std::unique_ptr<Object> object) {
+  void addObject(std::unique_ptr<Object> object) {
     object->scene_ = this;
-    // objects_.push_back(std::move(object));
+    objects_.push_back(std::move(object));
   }
-  Material* AddMaterial(std::string name) {
-    // Material mat(name, materials_.size());
-    // materials_.push_back(std::move(mat));
+  Material* addMaterial(std::string name) {
+    Material mat(name, materials_.size());
+    materials_.push_back(std::move(mat));
     return &materials_.back();
   }
 
 public:
-  // std::vector<std::unique_ptr<Object>> objects_;
+  std::vector<std::unique_ptr<Object>> objects_;
   std::vector<Sphere> spheres_;
   // std::vector<Light> lights_;
   std::vector<Material> materials_;
