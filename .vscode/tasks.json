@@ -22,6 +22,39 @@
                 "kind": "build",
                 "isDefault": true
             }
+        },
+        {
+            "label": "windows build (debug)",
+            "command": "msbuild",
+            "type": "process",
+            "args": [
+                "WeekendRaytracer.sln"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": "$tsc",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "windows build (release)",
+            "command": "msbuild",
+            "type": "process",
+            "args": [
+                "WeekendRaytracer.sln",
+                "/property:Configuration=Release"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": "$tsc",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
         }
     ]
 }

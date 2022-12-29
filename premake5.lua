@@ -4,6 +4,8 @@ workspace "WeekendRaytracer"
    configurations { "Debug", "Release", "Dist" }
    startproject "WalnutApp"
 
+require "export-compile-commands"
+
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 include "Walnut/WalnutExternal.lua"
 
