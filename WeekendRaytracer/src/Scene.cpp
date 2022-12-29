@@ -26,7 +26,7 @@ void Object::setMaterial(std::string materialName, Scene& scene) {
 //   return scene_->materials_.at(materialIndex);
 // }
 
-bool Sphere::rayIntersection(const Ray& ray, float& hitDistance) const {
+[[nodiscard]] bool Sphere::rayIntersection(const Ray& ray, float& hitDistance) const {
   glm::vec3 origin = ray.origin - position;
 
   float a = glm::dot(ray.direction, ray.direction);

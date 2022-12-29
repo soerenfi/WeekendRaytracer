@@ -7,6 +7,7 @@
 #include "Camera.h"
 #include "Ray.h"
 #include "Scene.h"
+#include "Scheduler.h"
 #include "Walnut/Image.h"
 
 class Renderer {
@@ -44,6 +45,8 @@ private:
   Settings                       settings_;
 
   std::vector<uint32_t> imageHorizontalIter_, imageVerticalIter_;
+
+  ThreadPool threads_;
 
   const Scene*  activeScene_      = nullptr;
   const Camera* activeCamera_     = nullptr;

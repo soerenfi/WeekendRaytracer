@@ -110,7 +110,7 @@ public:
   }
 
   void Render() {
-    ZoneScopedN("render");
+    // ZoneScopedN("render");
 
     Timer timer;
 

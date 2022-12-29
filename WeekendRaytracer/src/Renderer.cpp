@@ -51,6 +51,7 @@ void Renderer::OnResize(uint32_t width, uint32_t height) {
 }
 
 void Renderer::Render(const Scene& scene, const Camera& camera) {
+  ZoneScopedN(__func__);
   activeScene_  = &scene;
   activeCamera_ = &camera;
 
@@ -58,33 +59,22 @@ void Renderer::Render(const Scene& scene, const Camera& camera) {
     memset(accumulationData_, 0, finalImage_->GetWidth() * finalImage_->GetHeight() * sizeof(glm::vec4));
   }
 
-  std::vector<std::future<void>> threads;
-  threads.reserve(imageVerticalIter_.size());
-
   for (const uint32_t& y : imageVerticalIter_) {
-    auto async_thread = [this, y]() -> void {
+    threads_.queue([this, y] {
       for (const uint32_t& x : imageHorizontalIter_) {
-        glm::vec4 pixel = PerPixel(x, y);
-        accumulationData_[x + y * finalImage_->GetWidth()] += pixel;
-        glm::vec4 accumulatedColor = (accumulationData_[x + y * finalImage_->GetWidth()]) / (float)frameIndex_;
+        glm::vec4 color = PerPixel(x, y);
+        accumulationData_[x + y * finalImage_->GetWidth()] += color;
+
+        glm::vec4 accumulatedColor = accumulationData_[x + y * finalImage_->GetWidth()] / (float)frameIndex_;
         accumulatedColor           = glm::clamp(accumulatedColor, glm::vec4(0.0f), glm::vec4(1.0f));
         imageData_[x + y * finalImage_->GetWidth()] = Utils::ConvertToRGBA(accumulatedColor);
       }
-    };
-
-    threads.emplace_back(std::async(std::launch::async, async_thread));
-  };
-
-#define MT 1
-#if MT
-  std::for_each(std::execution::par, threads.begin(), threads.end(), [](const std::future<void>& thread) {
-    thread.wait();
-  });
-#else
-  for (const std::future<void>& thread : threads) thread.wait();
-#endif
+    });
+  }
+  threads_.wait();
 
   finalImage_->SetData(imageData_);
+  FrameMark;
   if (settings_.Accumulate) {
     frameIndex_++;
   } else {
@@ -93,7 +83,7 @@ void Renderer::Render(const Scene& scene, const Camera& camera) {
 }
 
 glm::vec4 Renderer::PerPixel(uint32_t x, uint32_t y) {
-  ZoneScopedN("PerPixel");
+  // ZoneScopedN("PerPixel");
 
   Ray ray;
   ray.origin    = activeCamera_->GetPosition();
