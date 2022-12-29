@@ -13,12 +13,12 @@ Camera::Camera(float verticalFOV, float nearClip, float farClip)
     , nearClip_(nearClip)
     , farClip_(farClip) {
   forwardDirection_ = glm::vec3(0, 0, -1);
-  position_ = glm::vec3(0, 0, 6);
+  position_         = glm::vec3(0, 0, 6);
 }
 
 bool Camera::OnUpdate(float ts) {
   glm::vec2 mousePos = Input::GetMousePosition();
-  glm::vec2 delta = (mousePos - lastMousePosition_) * 0.002f;
+  glm::vec2 delta    = (mousePos - lastMousePosition_) * 0.002f;
   lastMousePosition_ = mousePos;
 
   if (!Input::IsMouseButtonDown(MouseButton::Right)) {
@@ -31,7 +31,7 @@ bool Camera::OnUpdate(float ts) {
   bool moved = false;
 
   constexpr glm::vec3 upDirection(0.0f, 1.0f, 0.0f);
-  glm::vec3 rightDirection = glm::cross(forwardDirection_, upDirection);
+  glm::vec3           rightDirection = glm::cross(forwardDirection_, upDirection);
 
   float speed = 5.0f;
 
@@ -61,7 +61,7 @@ bool Camera::OnUpdate(float ts) {
   // Rotation
   if (delta.x != 0.0f || delta.y != 0.0f) {
     float pitchDelta = delta.y * GetRotationSpeed();
-    float yawDelta = delta.x * GetRotationSpeed();
+    float yawDelta   = delta.x * GetRotationSpeed();
 
     glm::quat q = glm::normalize(
       glm::cross(glm::angleAxis(-pitchDelta, rightDirection), glm::angleAxis(-yawDelta, glm::vec3(0.f, 1.0f, 0.0f))));
@@ -83,7 +83,7 @@ void Camera::OnResize(uint32_t width, uint32_t height) {
     return;
   }
 
-  viewportWidth_ = width;
+  viewportWidth_  = width;
   viewportHeight_ = height;
 
   RecalculateProjection();
@@ -101,7 +101,7 @@ void Camera::RecalculateProjection() {
 }
 
 void Camera::RecalculateView() {
-  view_ = glm::lookAt(position_, position_ + forwardDirection_, glm::vec3(0, 1, 0));
+  view_        = glm::lookAt(position_, position_ + forwardDirection_, glm::vec3(0, 1, 0));
   inverseView_ = glm::inverse(view_);
 }
 
@@ -111,7 +111,7 @@ void Camera::RecalculateRayDirections() {
   for (uint32_t y = 0; y < viewportHeight_; y++) {
     for (uint32_t x = 0; x < viewportWidth_; x++) {
       glm::vec2 coord = {(float)x / (float)viewportWidth_, (float)y / (float)viewportHeight_};
-      coord = coord * 2.0f - 1.0f;  // -1 -> 1
+      coord           = coord * 2.0f - 1.0f;  // -1 -> 1
 
       glm::vec4 target = inverseProjection_ * glm::vec4(coord.x, coord.y, 1, 1);
       glm::vec3 rayDirection =

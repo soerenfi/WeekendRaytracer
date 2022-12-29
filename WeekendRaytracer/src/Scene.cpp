@@ -37,21 +37,17 @@ bool Sphere::rayIntersection(const Ray& ray, float& hitDistance) const {
   // b^2 - 4ac
 
   float discriminant = b * b - 4.0f * a * c;
-  // std::cout << "pos2 " << glm::to_string(Position) << std::endl;
-  // std::cout << "disc2 " << discriminant << std::endl;
   if (discriminant < 0.0f) {
     return false;
   }
 
   // Quadratic formula:
   // (-b +- sqrt(discriminant)) / 2a
-
   // float t0 = (-b + glm::sqrt(discriminant)) / (2.0f * a);
   float closestT = (-b - glm::sqrt(discriminant)) / (2.0f * a);
+
   if (closestT > 0.0f && closestT < hitDistance) {
     hitDistance = closestT;
-    // payload.hitDistance = closestT;
-    // payload.objectIndex=  index;
     return true;
   }
   return false;

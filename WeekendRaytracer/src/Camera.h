@@ -49,8 +49,8 @@ private:
   glm::mat4 inverseView_{1.0f};
 
   float verticalFov_ = 45.0f;
-  float nearClip_ = 0.1f;
-  float farClip_ = 100.0f;
+  float nearClip_    = 0.1f;
+  float farClip_     = 100.0f;
 
   glm::vec3 position_{0.0f, 0.0f, 0.0f};
   glm::vec3 forwardDirection_{0.0f, 0.0f, 0.0f};

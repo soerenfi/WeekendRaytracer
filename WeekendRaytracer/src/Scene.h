@@ -12,15 +12,15 @@ struct RayPayload;
 
 struct Material {
   glm::vec3 albedo{1.0f};
-  float roughness = 1.0f;
-  float metallic = 0.0f;
+  float     roughness = 1.0f;
+  float     metallic  = 0.0f;
 
 private:
   Material(const std::string name, int index)
       : index_(index)
       , name_(name) {}
 
-  int index_{-1};
+  int         index_{-1};
   std::string name_{};
 
   friend class Object;
@@ -30,18 +30,12 @@ private:
 class Object {
 public:
   virtual ~Object() = default;
-  // virtual void SetPosition(glm::vec3 pos) {
-  //   Position = pos;
-  // }
-  virtual void setMaterial(Material* mat) {
-    materialIndex = mat->index_;
-  }
   virtual void setMaterial(std::string materialName, Scene& scene);
 
-  const Material& getMaterial() const;
+  Material& getMaterial() const;
 
   glm::vec3 position{0.0f};
-  int materialIndex{-1};
+  int       materialIndex{-1};
 
   virtual bool rayIntersection(const Ray& ray, float& hitDistance) const = 0;
 
@@ -59,11 +53,6 @@ public:
   float radius = 0.5f;
 };
 
-// struct Scene {
-//   std::vector<Sphere> Spheres;
-//   std::vector<Material> Materials;
-// };
-
 class Scene {
 public:
   void addObject(std::unique_ptr<Object> object) {
@@ -78,7 +67,6 @@ public:
 
 public:
   std::vector<std::unique_ptr<Object>> objects_;
-  std::vector<Sphere> spheres_;
   // std::vector<Light> lights_;
   std::vector<Material> materials_;
 

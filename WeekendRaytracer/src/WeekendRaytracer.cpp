@@ -13,45 +13,30 @@ class ExampleLayer : public Walnut::Layer {
 public:
   ExampleLayer()
       : mCamera_(45.0f, 0.1f, 100.0f) {
-    // Material& pink = scene_.materials_.emplace_back();
-    Material* metal = scene_.addMaterial("metal");
-    metal->albedo = {1.0f, 0.0f, 1.0f};
-    metal->roughness = 0.0f;
-
-    Material* wood = scene_.addMaterial("wood");
-    wood->albedo = {0.2f, 0.3f, 1.0f};
-    wood->roughness = 0.6f;
-
     {
-      Sphere sphere;
-      sphere.position = {0.0f, 0.0f, 0.0f};
-      sphere.radius = 1.0f;
-      // sphere.materialIndex = 0;
-      sphere.setMaterial("metal", scene_);
-      scene_.spheres_.push_back(sphere);
+      Material* metal  = scene_.addMaterial("metal");
+      metal->albedo    = {1.0f, 0.0f, 1.0f};
+      metal->roughness = 0.0f;
     }
-    // {
-    //   std::unique_ptr<Sphere> sphere = std::make_unique<Sphere>();
-    //   sphere->position = {0.0f, 0.0f, -1.0f};
-    //   sphere->radius = 1.0f;
-    //   sphere->setMaterial("metal", scene_);
-
-    //   scene_.addObject(std::move(sphere));
-    // }
     {
-      Sphere sphere;
-      sphere.position = {0.0f, -101.0f, 0.0f};
-      sphere.radius = 100.0f;
-      sphere.setMaterial("wood", scene_);
-      scene_.spheres_.push_back(sphere);
+      Material* wood  = scene_.addMaterial("wood");
+      wood->albedo    = {0.2f, 0.3f, 1.0f};
+      wood->roughness = 0.2f;
     }
-    // {
-    //   std::unique_ptr<Sphere> sphere = std::make_unique<Sphere>();
-    //   sphere->position = {0.0f, -101.0f, 0.0f};
-    //   sphere->radius = 1.0f;
-    //   sphere->setMaterial("metal", scene_);
-    //   scene_.addObject(std::move(sphere));
-    // }
+    {
+      std::unique_ptr<Sphere> sphere = std::make_unique<Sphere>();
+      sphere->position               = {0.0f, 0.0f, -1.0f};
+      sphere->radius                 = 1.0f;
+      sphere->setMaterial("metal", scene_);
+      scene_.addObject(std::move(sphere));
+    }
+    {
+      std::unique_ptr<Sphere> sphere = std::make_unique<Sphere>();
+      sphere->position               = {0.0f, -101.0f, 0.0f};
+      sphere->radius                 = 100.0f;
+      sphere->setMaterial("wood", scene_);
+      scene_.addObject(std::move(sphere));
+    }
   }
 
   void OnUpdate(float ts) override {
@@ -79,7 +64,9 @@ public:
 
       Object* object = scene_.objects_[i].get();
       ImGui::DragFloat3("Position", glm::value_ptr(object->position), 0.1f);
-      // ImGui::DragFloat("Radius", &sphere.radius, 0.1f);
+      if (dynamic_cast<Sphere*>(object) != nullptr) {
+        ImGui::DragFloat("Radius", &dynamic_cast<Sphere*>(object)->radius, 0.1f);
+      }
       ImGui::DragInt("Material", &object->materialIndex, 1.0f, 0, (int)scene_.materials_.size() - 1);
 
       ImGui::Separator();
@@ -105,7 +92,7 @@ public:
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
     ImGui::Begin("Viewport");
 
-    viewportWidth_ = ImGui::GetContentRegionAvail().x;
+    viewportWidth_  = ImGui::GetContentRegionAvail().x;
     viewportHeight_ = ImGui::GetContentRegionAvail().y;
 
     auto image = renderer_.GetFinalImage();
@@ -131,8 +118,8 @@ public:
 
 private:
   Renderer renderer_;
-  Camera mCamera_;
-  Scene scene_;
+  Camera   mCamera_;
+  Scene    scene_;
   uint32_t viewportWidth_ = 0, viewportHeight_ = 0;
 
   float lastRenderTime_ = 0.0f;

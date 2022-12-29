@@ -41,15 +41,14 @@ private:
 
 private:
   std::shared_ptr<Walnut::Image> finalImage_;
-  Settings settings_;
+  Settings                       settings_;
 
   std::vector<uint32_t> imageHorizontalIter_, imageVerticalIter_;
 
-  const Scene* activeScene_ = nullptr;
-  const Camera* activeCamera_ = nullptr;
-
-  uint32_t* imageData_ = nullptr;
-  glm::vec4* accumulationData_ = nullptr;
+  const Scene*  activeScene_      = nullptr;
+  const Camera* activeCamera_     = nullptr;
+  uint32_t*     imageData_        = nullptr;
+  glm::vec4*    accumulationData_ = nullptr;
 
   uint32_t frameIndex_ = 1;
 };
