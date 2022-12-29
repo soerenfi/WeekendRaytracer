@@ -7,6 +7,8 @@ project "WeekendRaytracer"
 
    files { "src/**.h", "src/**.cpp" }
 
+   defines { "TRACY_ENABLE" }
+
    includedirs
    {
       "../Walnut/vendor/imgui",
@@ -16,11 +18,13 @@ project "WeekendRaytracer"
       "../Walnut/Walnut/src",
 
       "%{IncludeDir.VulkanSDK}",
+      "../thirdparty/tracy/public"
    }
 
    links
    {
-       "Walnut"
+       "Walnut",
+       "Tracy",
    }
 
    if string.find(_ACTION, "gmake") then

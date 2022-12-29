@@ -1,12 +1,28 @@
 -- premake5.lua
 workspace "WeekendRaytracer"
    architecture "x64"
-   configurations { "Debug", "Release", "Dist" }
-   startproject "WalnutApp"
+   configurations { "Debug", "Release" }
+   startproject "WeekendRaytracer"
+   outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
+   
+   require "export-compile-commands"
+      
+   defines {"TRACY_ENABLE"}
+   
+   project "Tracy"
+      kind "StaticLib"
+      language "C++"
+      cppdialect "C++17"
+      targetdir "bin/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
+      staticruntime "off"
 
-require "export-compile-commands"
+      files { "thirdparty/tracy/public/TracyClient.cpp" }
 
-outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
-include "Walnut/WalnutExternal.lua"
+      includedirs
+      {
+         "thirdparty/tracy/public"
+      }
 
-include "WeekendRaytracer"
+   include "Walnut/WalnutExternal.lua"
+
+   include "WeekendRaytracer"

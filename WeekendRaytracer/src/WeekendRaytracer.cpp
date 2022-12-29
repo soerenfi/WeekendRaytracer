@@ -6,6 +6,7 @@
 #include "Walnut/EntryPoint.h"
 #include "Walnut/Image.h"
 #include "Walnut/Timer.h"
+#include "tracy/Tracy.hpp"
 
 using namespace Walnut;
 
@@ -45,6 +46,8 @@ public:
   }
 
   void OnUIRender() override {
+    FrameMarkNamed("UIRender");
+
     ImGui::Begin("Settings");
     ImGui::Text("Last render: %.3fms", lastRenderTime_);
     if (ImGui::Button("Render")) {
@@ -107,6 +110,8 @@ public:
   }
 
   void Render() {
+    ZoneScopedN("render");
+
     Timer timer;
 
     renderer_.OnResize(viewportWidth_, viewportHeight_);
