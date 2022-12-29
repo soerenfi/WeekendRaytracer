@@ -7,6 +7,8 @@ ColumnLimit: 120
 AllowShortFunctionsOnASingleLine: Empty
 AllowShortIfStatementsOnASingleLine: Never
 AllowShortLambdasOnASingleLine: Empty
+AlignConsecutiveAssignments: true
+AlignConsecutiveDeclarations: true
 AccessModifierOffset: -2
 TabWidth: 2
 ContinuationIndentWidth: 2
