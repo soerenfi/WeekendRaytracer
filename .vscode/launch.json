@@ -20,6 +20,17 @@
                 }
             ],
             "preLaunchTask": "build (debug)"
+        },
+        {
+            "name": "Debug WeekendRaytracer (Windows)",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/bin/Debug-windows-x86_64/WeekendRaytracer/WeekendRaytracer.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "externalConsole": false,
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "windows build (debug)"
         }
     ]
 }
