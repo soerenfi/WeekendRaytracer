@@ -4,68 +4,45 @@
 
 #include <memory>
 #include <string>
-#include <utility>
 #include <vector>
 
-#include "Ray.h"
-
 class Scene;
-class Material {
-public:
-  void SetAlbedo(glm::vec3 albedo) {
-    albedo_ = albedo;
-  }
-  void SetMetallic(float metallic) {
-    metallic_ = metallic;
-  }
-  const glm::vec3& GetAlbedo() const {
-    return albedo_;
-  }
-  const float& GetRoughness() const {
-    return roughness_;
-  }
-  const float& GetMetallic() const {
-    return metallic_;
-  }
+struct Ray;
+struct RayPayload;
 
-private:
-  Material(const std::string name, int index)
-      : index_(index)
-      , name_(name) {}
+struct Material {
+  glm::vec3 albedo{1.0f};
+  float roughness = 1.0f;
+  float metallic = 0.0f;
 
-  glm::vec3 albedo_{1.0f};
-  float roughness_ = 1.0f;
-  float metallic_ = 0.0f;
-  int index_;
+  // private:
+  //   Material(const std::string name, int index)
+  //       : index_(index)
+  //       , name_(name) {}
+
+  int index_{-1};
   std::string name_{};
 
-  friend class Scene;
   friend class Object;
-  friend class Viewport;
-};
-
-struct Light {
-  glm::vec3 position;
-  glm::vec3 color{1.0f};
-  float intensity;
+  friend class Scene;
 };
 
 class Object {
 public:
   virtual ~Object() = default;
-  virtual void SetPosition(glm::vec3 pos) {
-    position = pos;
-  }
-  virtual void SetMaterial(Material* mat) {
-    materialIndex = mat->index_;
-  }
-  virtual void SetMaterial(std::string materialName, Scene& scene);
-  const Material& GetMaterial() const;
+  // virtual void SetPosition(glm::vec3 pos) {
+  //   Position = pos;
+  // }
+  // virtual void SetMaterial(Material* mat) {
+  //   materialIndex = mat->index_;
+  // }
+  // virtual void SetMaterial(std::string materialName, Scene& scene);
+  // const Material& GetMaterial() const;
 
   glm::vec3 position{0.0f};
   int materialIndex{-1};
 
-  virtual bool RayIntersection(glm::vec3& rayOrigin, glm::vec3 rayDirection, float& hitDistance) const = 0;
+  virtual bool RayIntersection(const Ray& ray, float& hitDistance) const = 0;
 
 private:
   Scene* scene_ = nullptr;
@@ -76,32 +53,32 @@ private:
 class Sphere : public Object {
 public:
   virtual ~Sphere() = default;
-  void SetRadius(float radius) {
-    radius_ = radius;
-  }
+  bool RayIntersection(const Ray& ray, float& hitDistance) const override;
 
-public:
-  bool RayIntersection(glm::vec3& rayOrigin, glm::vec3 rayDirection, float& hitDistance) const override;
-
-private:
   float radius_ = 0.5f;
 };
+
+// struct Scene {
+//   std::vector<Sphere> Spheres;
+//   std::vector<Material> Materials;
+// };
 
 class Scene {
 public:
   void AddObject(std::unique_ptr<Object> object) {
     object->scene_ = this;
-    objects_.push_back(std::move(object));
+    // objects_.push_back(std::move(object));
   }
   Material* AddMaterial(std::string name) {
-    Material mat(name, materials_.size());
-    materials_.push_back(std::move(mat));
+    // Material mat(name, materials_.size());
+    // materials_.push_back(std::move(mat));
     return &materials_.back();
   }
 
-protected:
-  std::vector<std::unique_ptr<Object>> objects_;
-  std::vector<Light> lights_;
+public:
+  // std::vector<std::unique_ptr<Object>> objects_;
+  std::vector<Sphere> spheres_;
+  // std::vector<Light> lights_;
   std::vector<Material> materials_;
 
   friend class Object;

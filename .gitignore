@@ -16,3 +16,4 @@ Makefile
 Makefile.in
 
 compile_commands
+.cache

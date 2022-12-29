@@ -4,8 +4,6 @@
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
 
-#include <iostream>
-
 #include "Walnut/Input/Input.h"
 
 using namespace Walnut;
@@ -15,17 +13,17 @@ Camera::Camera(float verticalFOV, float nearClip, float farClip)
     , nearClip_(nearClip)
     , farClip_(farClip) {
   forwardDirection_ = glm::vec3(0, 0, -1);
-  position_ = glm::vec3(0, 0, 3);
+  position_ = glm::vec3(0, 0, 6);
 }
 
-void Camera::OnUpdate(float ts) {
+bool Camera::OnUpdate(float ts) {
   glm::vec2 mousePos = Input::GetMousePosition();
   glm::vec2 delta = (mousePos - lastMousePosition_) * 0.002f;
   lastMousePosition_ = mousePos;
 
   if (!Input::IsMouseButtonDown(MouseButton::Right)) {
     Input::SetCursorMode(CursorMode::Normal);
-    return;
+    return false;
   }
 
   Input::SetCursorMode(CursorMode::Locked);
@@ -76,11 +74,14 @@ void Camera::OnUpdate(float ts) {
     RecalculateView();
     RecalculateRayDirections();
   }
+
+  return moved;
 }
 
 void Camera::OnResize(uint32_t width, uint32_t height) {
-  if (width == viewportWidth_ && height == viewportHeight_)
+  if (width == viewportWidth_ && height == viewportHeight_) {
     return;
+  }
 
   viewportWidth_ = width;
   viewportHeight_ = height;
@@ -109,9 +110,8 @@ void Camera::RecalculateRayDirections() {
 
   for (uint32_t y = 0; y < viewportHeight_; y++) {
     for (uint32_t x = 0; x < viewportWidth_; x++) {
-      glm::vec2 coord = {static_cast<float>(x) / static_cast<float>(viewportWidth_),
-                         static_cast<float>(y) / static_cast<float>(viewportHeight_)};
-      coord = coord * 2.0f - 1.0f;
+      glm::vec2 coord = {(float)x / (float)viewportWidth_, (float)y / (float)viewportHeight_};
+      coord = coord * 2.0f - 1.0f;  // -1 -> 1
 
       glm::vec4 target = inverseProjection_ * glm::vec4(coord.x, coord.y, 1, 1);
       glm::vec3 rayDirection =

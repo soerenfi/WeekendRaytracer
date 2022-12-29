@@ -6,9 +6,9 @@
 
 class Camera {
 public:
-  Camera(float verticalFOV, float nearClip, float farClip);  // specify units
+  Camera(float verticalFOV, float nearClip, float farClip);
 
-  void OnUpdate(float ts);
+  bool OnUpdate(float ts);
   void OnResize(uint32_t width, uint32_t height);
 
   const glm::mat4& GetProjection() const {
@@ -23,14 +23,7 @@ public:
   const glm::mat4& GetInverseView() const {
     return inverseView_;
   }
-  // void setPosition(const glm::vec3& position)
-  // {
-  //     m_Position = position;
-  // }
-  // void lookAt(const glm::vec3 at)
-  // {
-  //     m_ForwardDirection = at;
-  // }
+
   const glm::vec3& GetPosition() const {
     return position_;
   }
@@ -49,6 +42,7 @@ private:
   void RecalculateView();
   void RecalculateRayDirections();
 
+private:
   glm::mat4 projection_{1.0f};
   glm::mat4 view_{1.0f};
   glm::mat4 inverseProjection_{1.0f};
