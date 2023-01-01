@@ -55,9 +55,9 @@ public:
     {
       std::unique_ptr<Plane> plane = std::make_unique<Plane>();
       plane->position              = {0.0f, 3.0f, 0.0f};
-      plane->normal                = {0.0f, 1.0f, 01.0f};
+      plane->normal                = {0.0f, -1.0f, 1.0f};
       plane->size                  = 5.0f;
-      plane->setMaterial("wood", scene_);
+      plane->setMaterial("metal", scene_);
       scene_.addObject(std::move(plane));
     }
   }

@@ -57,14 +57,16 @@ void Object::setMaterial(std::string materialName, Scene& scene) {
   glm::vec3 origin = ray.origin - position;
 
   float denom = glm::dot(ray.direction, normal);
-  if (denom > 1e-6) {
+  if (abs(denom) > 1e-6) {
     glm::vec3 p0l0 = position - ray.origin;
     auto      t    = glm::dot(p0l0, normal) / denom;
     if (t > 0) {
       glm::vec3 hitPoint = ray.origin + t * ray.direction;
       if (glm::length(hitPoint - position) < size) {
-        hitDistance = t;
-        return true;
+        if (t > 0.0f && t < hitDistance) {
+          hitDistance = t;
+          return true;
+        }
       }
     }
   }
