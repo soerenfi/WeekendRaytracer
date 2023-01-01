@@ -14,8 +14,8 @@
 
 class ThreadPool {
 public:
-  ThreadPool()
-      : threadCount_(std::thread::hardware_concurrency()) {
+  ThreadPool(size_t threadCount)
+      : threadCount_(threadCount) {
     threads_.resize(threadCount_);
     start();
   }

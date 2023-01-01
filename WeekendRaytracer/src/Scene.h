@@ -53,6 +53,15 @@ public:
   float radius = 0.5f;
 };
 
+class Plane : public Object {
+public:
+  virtual ~Plane() = default;
+  bool rayIntersection(const Ray& ray, float& hitDistance) const override;
+
+  glm::vec3 normal{0.0f};
+  float     size = 0.5f;
+};
+
 class Scene {
 public:
   void addObject(std::unique_ptr<Object> object) {

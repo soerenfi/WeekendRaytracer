@@ -93,7 +93,7 @@ glm::vec4 Renderer::PerPixel(uint32_t x, uint32_t y) {
   float     multiplier = 1.0f;
 
   int bounces = 5;
-  for (int i = 0; i < bounces; i++) {
+  for (int i = 0; i < bounces; i++) {  // recursion with restricted recursion depth
     RayPayload payload = TraceRay(ray);
     if (payload.hitDistance < 0.0f) {
       glm::vec3 skyColor = glm::vec3(0.6f, 0.7f, 0.9f);

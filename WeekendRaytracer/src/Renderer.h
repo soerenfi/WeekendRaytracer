@@ -46,7 +46,7 @@ private:
 
   std::vector<uint32_t> imageHorizontalIter_, imageVerticalIter_;
 
-  ThreadPool threads_;
+  ThreadPool threads_{std::thread::hardware_concurrency()};
 
   const Scene*  activeScene_      = nullptr;
   const Camera* activeCamera_     = nullptr;

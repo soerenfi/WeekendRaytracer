@@ -28,6 +28,20 @@ public:
       std::unique_ptr<Sphere> sphere = std::make_unique<Sphere>();
       sphere->position               = {0.0f, 0.0f, -1.0f};
       sphere->radius                 = 1.0f;
+      sphere->setMaterial("wood", scene_);
+      scene_.addObject(std::move(sphere));
+    }
+    {
+      std::unique_ptr<Sphere> sphere = std::make_unique<Sphere>();
+      sphere->position               = {2.0f, 0.0f, -1.0f};
+      sphere->radius                 = 1.0f;
+      sphere->setMaterial("metal", scene_);
+      scene_.addObject(std::move(sphere));
+    }
+    {
+      std::unique_ptr<Sphere> sphere = std::make_unique<Sphere>();
+      sphere->position               = {-2.0f, 0.0f, -1.0f};
+      sphere->radius                 = 1.0f;
       sphere->setMaterial("metal", scene_);
       scene_.addObject(std::move(sphere));
     }
@@ -37,6 +51,14 @@ public:
       sphere->radius                 = 100.0f;
       sphere->setMaterial("wood", scene_);
       scene_.addObject(std::move(sphere));
+    }
+    {
+      std::unique_ptr<Plane> plane = std::make_unique<Plane>();
+      plane->position              = {0.0f, 3.0f, 0.0f};
+      plane->normal                = {0.0f, 1.0f, 01.0f};
+      plane->size                  = 5.0f;
+      plane->setMaterial("wood", scene_);
+      scene_.addObject(std::move(plane));
     }
   }
 
